@@ -1,0 +1,456 @@
+{
+  "name": "Customer Feedback Tracker",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Feedback collector",
+        "formDescription": "Give us your genuine feedback! It helps improve our workflow and brings out better ideas",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name",
+              "placeholder": "Alex Morgan",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Please enter your email address",
+              "placeholder": "alex.morgan@example.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "We Value Your Feedback",
+              "placeholder": "What did you like? What can we improve? Share your honest feedback...",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "customCss": ":root {\n\t--font-family: 'Inter', 'Poppins', sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 600;\n\t--font-size-body: 14px;\n\t--font-size-label: 14px;\n\t--font-size-test-notice: 12px;\n\t--font-size-input: 15px;\n\t--font-size-header: 24px;\n\t--font-size-paragraph: 14px;\n\t--font-size-link: 13px;\n\t--font-size-error: 12px;\n\t--font-size-html-h1: 32px;\n\t--font-size-html-h2: 24px;\n\t--font-size-html-h3: 18px;\n\t--font-size-html-h4: 16px;\n\t--font-size-html-h5: 14px;\n\t--font-size-html-h6: 12px;\n\t--font-size-subheader: 15px;\n\n\t/* Colors - Modern Blue/Purple Theme */\n\t--color-background: #f4f6fb;\n\t--color-test-notice-text: #d97706;\n\t--color-test-notice-bg: #fffbeb;\n\t--color-test-notice-border: #fde68a;\n\t--color-card-bg: #ffffff;\n\t--color-card-border: #e5e7eb;\n\t--color-card-shadow: rgba(79, 70, 229, 0.08);\n\t--color-link: #6366f1;\n\t--color-header: #1f2937;\n\t--color-label: #374151;\n\t--color-input-border: #d1d5db;\n\t--color-input-text: #374151;\n\t--color-focus-border: #6366f1;\n\t--color-submit-btn-bg: #6366f1;\n\t--color-submit-btn-text: #ffffff;\n\t--color-error: #ef4444;\n\t--color-required: #ef4444;\n\t--color-clear-button-bg: #9ca3af;\n\t--color-html-text: #4b5563;\n\t--color-html-link: #6366f1;\n\t--color-header-subtext: #6b7280;\n\n\t/* Border Radii - Softer, Modern */\n\t--border-radius-card: 16px;\n\t--border-radius-input: 10px;\n\t--border-radius-clear-btn: 50%;\n\t--card-border-radius: 16px;\n\n\t/* Spacing - More Breathing Room */\n\t--padding-container-top: 40px;\n\t--padding-card: 32px;\n\t--padding-test-notice-vertical: 14px;\n\t--padding-test-notice-horizontal: 24px;\n\t--margin-bottom-card: 20px;\n\t--padding-form-input: 14px;\n\t--card-padding: 32px;\n\t--card-margin-bottom: 20px;\n\n\t/* Dimensions */\n\t--container-width: 480px;\n\t--submit-btn-height: 52px;\n\t--checkbox-size: 20px;\n\n\t/* Others - Stronger Shadow for Depth */\n\t--box-shadow-card: 0px 8px 30px 0px var(--color-card-shadow);\n\t--opacity-placeholder: 0.6;\n}"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -384,
+        -272
+      ],
+      "id": "f03d6fb4-cc78-4891-865a-a22a1a34a282",
+      "name": "Customer Details & Feedback Form",
+      "webhookId": "17c7fd11-0388-448f-945f-22764e99f49c"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json['We Value Your Feedback'] }}",
+        "options": {
+          "categories": "Positive, Negative"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        -272
+      ],
+      "id": "04088144-9c6a-4838-8aa1-2a071acf34cf",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Positive",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Customer Details & Feedback Form').item.json.Name }}",
+            "Email": "={{ $('Customer Details & Feedback Form').item.json['Please enter your email address'] }}",
+            "Feedback": "={{ $('Customer Details & Feedback Form').item.json['We Value Your Feedback'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Feedback",
+              "displayName": "Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        -560
+      ],
+      "id": "226c4ddc-0715-47e7-aeb2-cfac9a21c066",
+      "name": "Store Positive Feedback",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "googleSheetsOAuth2Api_id",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Act as a professional and welcoming Customer Success Manager for our company. Your task is to write a highly professional, warm, and personalized thank-you email to a customer who just left positive feedback.\n\nHere is the Customer's Information:\nCustomer Name: {{ $('Sentiment Analysis').item.json.Name }}\nCustomer Feedback: {{ $('Sentiment Analysis').item.json['We Value Your Feedback'] }}\n\nRules for generating the email:\n\n1.Warmly thank the customer for taking the time to share their positive experience.\n2.Subtly reference a specific point from their feedback so the email feels genuinely personalized.\n3.Express how much their kind words motivate our team.\n4.Keep the tone appreciative, polite, and strictly professional.\n5.Keep the email concise (maximum 2 short paragraphs).\n6.CRITICAL REQUIREMENT: The entire response MUST be in valid HTML format. Use appropriate HTML tags like <p> for paragraphs and <b> or <strong> if you want to highlight anything subtly.\n7.Output ONLY the raw HTML content starting with <p>Dear {{ $('Sentiment Analysis').item.json.Name }},</p>.\n8.DO NOT include markdown formatting like ```html. DO NOT include outer tags like <html> or <body>. Just output the clean HTML paragraphs. DO NOT include subject lines or concluding signatures.\n",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        688,
+        -560
+      ],
+      "id": "1fc0b758-419a-42fc-8ce9-cfe76201449a",
+      "name": "Prepare Positive Feedback Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Customer Details & Feedback Form').item.json['Please enter your email address'] }}",
+        "subject": "=Thank you for your wonderful feedback, {{ $('Customer Details & Feedback Form').item.json.Name }}!",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1232,
+        -560
+      ],
+      "id": "ada4e256-eb6c-4f3c-ab87-51979acd9921",
+      "name": "Send Feedback Response",
+      "webhookId": "da0359e4-fe3d-4a2e-8682-211aaf3355d0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmailOAuth2_id",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Act as an expert Customer Experience Data Analyst. Your task is to analyze a customer's negative feedback and extract the EXACT bad situation or core issue they faced.\n\nHere is the Customer's Negative Feedback:\n{{ $('Customer Details & Feedback Form').item.json['We Value Your Feedback'] }}\n\nRules for Extraction:\n\n1.Identify the primary problem or pain point the customer is complaining about.\n2.Summarize the issue into a highly concise, professional short phrase (maximum 2 to 6 words).\n(Example: If the customer says \"I waited for 2 hours and the guy was shouting at me\", your output should be \"Late delivery and rude behavior\").\n3.If there are multiple issues, combine the top 2 issues concisely.\n4.Keep the output strictly as a single line of text.\n5CRITICAL: Do NOT include any conversational text, introductory words, or explanations. Output ONLY the summarized issue so it can be directly saved into a database column.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        240,
+        -32
+      ],
+      "id": "d4775004-b20a-4b9d-af6e-3d6f3a0e447b",
+      "name": "Filter Negative Feedback"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Negative",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Customer Details & Feedback Form').item.json.Name }}",
+            "Email": "={{ $('Customer Details & Feedback Form').item.json['Please enter your email address'] }}",
+            "Feedback": "={{ $('Customer Details & Feedback Form').item.json['We Value Your Feedback'] }}",
+            "Customer Pain Points": "={{ $json.text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Feedback",
+              "displayName": "Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Pain Points",
+              "displayName": "Customer Pain Points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        704,
+        -32
+      ],
+      "id": "455090e6-894e-4a94-bf15-6207c13685ad",
+      "name": "Store Negative Feedback",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "googleSheetsOAuth2Api_id",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Act as a professional and empathetic Customer Success Manager. Your task is to write a highly professional, sincere apology email to a customer who just left negative feedback.\n\nHere is the Customer's Information:\nCustomer Name: {{ $('Customer Details & Feedback Form').item.json.Name }}\nCustomer's Negative Feedback: {{$('Customer Details & Feedback Form').item.json['We Value Your Feedback'] }}\n\nRules for generating the email:\n\n1.Start by sincerely apologizing for the specific bad experience they had.\n2.Briefly acknowledge their specific issue (from the feedback) so they know we actually read it and understand their frustration.\n3.Assure them that we take this very seriously, and our team is already looking into this to fix it as quickly as possible.\n4.Keep the tone highly empathetic, respectful, and strictly professional.\n5.Keep the email concise (maximum 2 to 3 short paragraphs).\n6.CRITICAL REQUIREMENT: The entire response MUST be in valid HTML format. Use appropriate HTML tags like <p> for paragraphs and <b> or <strong> if you want to highlight anything subtly.\n7.Output ONLY the raw HTML content starting with <p>Dear {{ $('Customer Details & Feedback Form').item.json.Name }},</p>.\n8.DO NOT include markdown formatting like ```html. DO NOT include outer tags like <html> or <body>. DO NOT include subject lines or concluding signatures.\n",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        960,
+        -32
+      ],
+      "id": "f3ef04ce-6460-488d-a120-856233529569",
+      "name": "Prepare Apology Email"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Customer Details & Feedback Form').item.json['Please enter your email address'] }}",
+        "subject": "=We sincerely apologize for your experience, {{ $('Customer Details & Feedback Form').item.json.Name }}",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1264,
+        -32
+      ],
+      "id": "086e6e9f-e161-410e-8447-3db74a98fc0d",
+      "name": "Send Apology Email",
+      "webhookId": "3d3d2e32-23e6-468d-a62e-4b9ad9cdc13e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmailOAuth2_id",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        -256
+      ],
+      "id": "2ab34e9d-198e-4af4-bce3-17f749c25cb3",
+      "name": "Feedback Intelligence",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "googlePalmApi_id",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Customer Details & Feedback Form": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Store Positive Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter Negative Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Positive Feedback": {
+      "main": [
+        [
+          {
+            "node": "Prepare Positive Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Positive Feedback Email": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Negative Feedback": {
+      "main": [
+        [
+          {
+            "node": "Store Negative Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Negative Feedback": {
+      "main": [
+        [
+          {
+            "node": "Prepare Apology Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Apology Email": {
+      "main": [
+        [
+          {
+            "node": "Send Apology Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback Intelligence": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Prepare Positive Feedback Email",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Filter Negative Feedback",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Prepare Apology Email",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4d08252b-ad25-4ad9-bf1e-9e7c071fa3dc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3ba477be035fb9c2bd1ff6e3d281337471ccc47f3d005ddc01bb0ec599e3a246"
+  },
+  "nodeGroups": [],
+  "id": "pZOUMP0iyBXAxK90",
+  "tags": []
+}
