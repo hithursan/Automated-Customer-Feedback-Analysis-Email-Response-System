@@ -61,4 +61,9 @@ customer-feedback-tracker-n8n/
 └── .gitignore                 # Files to exclude from git
 ```
 ## Author
-Hithursan Navaretnarasa
+**Hithursan Navaretnarasa**
+
+---
+<div align="center" font-wight=800>
+Crafted with ❤️ for the modern connoisseu#
+</div>
